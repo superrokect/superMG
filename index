@@ -1,0 +1,185 @@
+tP.prototype.update = function(e, t, a, r, n, i, c) {
+            void 0 === a && (a = ev(r));
+            var f = (0 === t ? a : a >>> t) & 31
+              , d = this.nodes
+              , s = d[f];
+            if (n === l && !s)
+                return this;
+            var o = tq(s, e, t + 5, a, r, n, i, c);
+            if (o === s)
+                return this;
+            var u = this.count;
+            if (s) {
+                if (!o && --u < tV)
+                    return function(e, t, a, r) {
+                        for (var n = 0, i = 0, c = Array(a), f = 0, d = 1, s = t.length; f < s; f++,
+                        d <<= 1) {
+                            var o = t[f];
+                            void 0 !== o && f !== r && (n |= d,
+                            c[i++] = o)
+                        }
+                        return new tR(e,n,c)
+                    }(e, d, u, f)
+            } else
+                u++;
+            var b = e && e === this.ownerID
+              , h = tK(d, f, o, b);
+            return b ? (this.count = u,
+            this.nodes = h,
+            this) : new tP(e,u,h)
+        }
+        ;
+        var tT = function(e, t, a) {
+            this.ownerID = e,
+            this.keyHash = t,
+            this.entries = a
+        };
+        tT.prototype.get = function(e, t, a, r) {
+            for (var n = this.entries, i = 0, c = n.length; i < c; i++)
+                if (ep(a, n[i][0]))
+                    return n[i][1];
+            return r
+        }
+        ,
+        tT.prototype.update = function(e, t, a, r, n, i, c) {
+            void 0 === a && (a = ev(r));
+            var f = n === l;
+            if (a !== this.keyHash)
+                return f ? this : (g(c),
+                g(i),
+                tH(this, e, t, a, [r, n]));
+            for (var d = this.entries, s = 0, o = d.length; s < o && !ep(r, d[s][0]); s++)
+                ;
+            var u = s < o;
+            if (u ? d[s][1] === n : f)
+                return this;
+            if (g(c),
+            (f || !u) && g(i),
+            f && 2 === o)
+                return new tN(e,this.keyHash,d[1 ^ s]);
+            var b = e && e === this.ownerID
+              , h = b ? d : e0(d);
+            return (u ? f ? s === o - 1 ? h.pop() : h[s] = h.pop() : h[s] = [r, n] : h.push([r, n]),
+            b) ? (this.entries = h,
+            this) : new tT(e,this.keyHash,h)
+        }
+        ;
+        var tN = function(e, t, a) {
+            this.ownerID = e,
+            this.keyHash = t,
+            this.entry = a
+        };
+        tN.prototype.get = function(e, t, a, r) {
+            return ep(a, this.entry[0]) ? this.entry[1] : r
+        }
+        ,
+        tN.prototype.update = function(e, t, a, r, n, i, c) {
+            var f = n === l
+              , d = ep(r, this.entry[0]);
+            if (d ? n === this.entry[1] : f)
+                return this;
+            if (g(c),
+            f) {
+                g(i);
+                return
+            }
+            return d ? e && e === this.ownerID ? (this.entry[1] = n,
+            this) : new tN(e,this.keyHash,[r, n]) : (g(i),
+            tH(this, e, t, ev(r), [r, n]))
+        }
+        ,
+        tC.prototype.iterate = tT.prototype.iterate = function(e, t) {
+            for (var a = this.entries, r = 0, n = a.length - 1; r <= n; r++)
+                if (!1 === e(a[t ? n - r : r]))
+                    return !1
+        }
+        ,
+        tR.prototype.iterate = tP.prototype.iterate = function(e, t) {
+            for (var a = this.nodes, r = 0, n = a.length - 1; r <= n; r++) {
+                var i = a[t ? n - r : r];
+                if (i && !1 === i.iterate(e, t))
+                    return !1
+            }
+        }
+        ,
+        tN.prototype.iterate = function(e, t) {
+            return e(this.entry)
+        }
+        ;
+        var tz = function(e) {
+            function t(e, t, a) {
+                this._type = t,
+                this._reverse = a,
+                this._stack = e._root && tD(e._root)
+            }
+            return e && (t.__proto__ = e),
+            t.prototype = Object.create(e && e.prototype),
+            t.prototype.constructor = t,
+            t.prototype.next = function() {
+                for (var e = this._type, t = this._stack; t; ) {
+                    var a = t.node
+                      , r = t.index++
+                      , n = void 0;
+                    if (a.entry) {
+                        if (0 === r)
+                            return tB(e, a.entry)
+                    } else if (a.entries) {
+                        if (r <= (n = a.entries.length - 1))
+                            return tB(e, a.entries[this._reverse ? n - r : r])
+                    } else if (r <= (n = a.nodes.length - 1)) {
+                        var i = a.nodes[this._reverse ? n - r : r];
+                        if (i) {
+                            if (i.entry)
+                                return tB(e, i.entry);
+                            t = this._stack = tD(i, t)
+                        }
+                        continue
+                    }
+                    t = this._stack = this._stack.__prev
+                }
+                return Z()
+            }
+            ,
+            t
+        }(K);
+        function tB(e, t) {
+            return $(e, t[0], t[1])
+        }
+        function tD(e, t) {
+            return {
+                node: e,
+                index: 0,
+                __prev: t
+            }
+        }
+        function tF(e, t, a, r) {
+            var n = Object.create(tO);
+            return n.size = e,
+            n._root = t,
+            n.__ownerID = a,
+            n.__hash = r,
+            n.__altered = !1,
+            n
+        }
+        function tU() {
+            return i || (i = tF(0))
+        }
+        function tj(e, t, a) {
+            if (e._root) {
+                var r, n, i = p(), c = p();
+                if (r = tq(e._root, e.__ownerID, 0, void 0, t, a, i, c),
+                !c.value)
+                    return e;
+                n = e.size + (i.value ? a === l ? -1 : 1 : 0)
+            } else {
+                if (a === l)
+                    return e;
+                n = 1,
+                r = new tC(e.__ownerID,[[t, a]])
+            }
+            return e.__ownerID ? (e.size = n,
+            e._root = r,
+            e.__hash = void 0,
+            e.__altered = !0,
+            e) : r ? tF(n, r) : tU()
+        }
